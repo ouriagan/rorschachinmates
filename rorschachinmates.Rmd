@@ -1,20 +1,24 @@
 ---
-title: "Rorschach Inmates"
-author: "Benjamin Thiry"
+title: "Variables Rorschach sur un échantillon de détenus belges francophones"
+author: "Benjamin Thiry et Paul Florin"
 date: "`r Sys.Date()`"
+bibliography : rorschachinmates.bib
 output:
-  html_document: default
   pdf_document: default
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(tidyverse)        # for data wrangling and visualization
 library(moments)
+library(tibble)
+library(kableExtra)
 library(papaja)
 # library(DataExplorer)     # for exploratory data analysis
 # library(datasets)         # for getting the data
-library(flextable)        # beautifying tables
+# library(flextable)        # beautifying tables
 rorschachtest <- read_csv2("C:/Users/Ouriagan/OneDrive/rorschach/rorschachtest.csv")
 attach(rorschachtest)
 ```
@@ -26,7 +30,9 @@ attach(rorschachtest)
 
 # Styles
 
-```{r}
+```{r echo=FALSE}
+Ntotal <- length(R)
+
 rorstyles.df <- data.frame(R, L, `Sum(M)`, WsumC, SumShd, es, esAj, `D score`, Daj, EA, `Sum(FM)`, `Sum(m')`, `Sum(C')`, `Sum(Y)`, `Sum(T)`, `Sum(V)`)
 
 # Normes
@@ -37,8 +43,6 @@ rorstyles_norms2 <- c(22.31, 0.86, 3.73, 3.11, 4.29, 9.09, 0, -0.68, -0.20, 6.84
 # Comparairons aux normes avec un test t
 
 # Charger la librairie tibble
-library(tibble)
-
 calculer_tests_t <- function(data, valeurs_cibles) {
   # Créer une tibble vide pour stocker les résultats des tests t
   resultats_tests <- tibble()
@@ -69,8 +73,6 @@ resultats_tests <- calculer_tests_t(data = rorstyles.df, valeurs_cibles = rorsty
 # Caclul des delta de Cohen
 
 # Charger la librairie tibble
-library(tibble)
-
 calculer_delta_cohen <- function(data, valeurs_cibles) {
   # Créer une tibble vide pour stocker les résultats des delta de Cohen
   resultats_delta <- tibble()
@@ -99,8 +101,7 @@ calculer_delta_cohen <- function(data, valeurs_cibles) {
 }
 
 resultats_delta <- calculer_delta_cohen(data = rorstyles.df, valeurs_cibles = rorstyles_norms)
-print(resultats_delta)
-
+# print(resultats_delta)
 
 rorstyles_names <- c("R", "L", "M", "WSumC", "SumShd", "es", "esAdj", "D", "Dadj",  "EA", "FM", "m", "SumC'", "Y", "T", "V")
 rorstyles_mean <- c(mean(R), mean(L), mean(`Sum(M)`), mean(WsumC), mean(SumShd), mean(es), mean(esAj), mean(`D score`), mean(Daj),  mean(EA), mean(`Sum(FM)`), mean(`Sum(m')`), mean(`Sum(C')`), mean(`Sum(Y)`), mean(`Sum(T)`), mean(`Sum(V)`))
@@ -116,8 +117,34 @@ rorstyles_skewness <- round(rorstyles_skewness,2)
 rorstyles_kurtosis = c(kurtosis(R), kurtosis(L), kurtosis(`Sum(M)`), kurtosis(WsumC), kurtosis(SumShd), kurtosis(es), kurtosis(esAj), kurtosis(`D score`), kurtosis(Daj),  kurtosis(EA), kurtosis(`Sum(FM)`), kurtosis(`Sum(m')`), kurtosis(`Sum(C')`), kurtosis(`Sum(Y)`), kurtosis(`Sum(T)`), kurtosis(`Sum(V)`))
 rorstyles_kurtosis <- round(rorstyles_kurtosis,2)
 #rorstyles_p <- resultats_tests[,2]
-rorstyles_table <- data.frame(Variable=rorstyles_names, Moyenne=rorstyles_mean, ET=rorstyles_sd, Min=rorstyles_min, Max = rorstyles_max, Skewness=rorstyles_skewness, Kurtosis=rorstyles_kurtosis, Norms=rorstyles_norms2, p=resultats_tests[,2], d=resultats_delta[,2])
-rorstyles_table
+rorstyles_table <- data.frame(Variable=rorstyles_names, Moyenne=rorstyles_mean, ET=rorstyles_sd, Min=rorstyles_min, Max = rorstyles_max, Skewness=rorstyles_skewness, Kurtosis=rorstyles_kurtosis, Norme=rorstyles_norms2, p=resultats_tests[,2], d=resultats_delta[,2])
+
+# Fréquence des styles de EB
+rorstylesEB <- table(`EB type`)
+rorstylesEBprop <- prop.table(rorstylesEB)
+rorstylesEBpropround <- round(rorstylesEBprop*100,0)
+
+#EB Per
+EBPer_num <- as.numeric(EBPer)
+nombre_de_na_EBPer_num <- sum(is.na(EBPer_num))
+meanEBPer <-  round(mean(EBPer_num, na.rm = TRUE),2)
+sdEBPer <-  round(sd(EBPer_num, na.rm = TRUE),2)
 ```
 
+```{r statdescstyles, echo=FALSE}
+kbl(rorstyles_table, caption = "Statistiques descriptives des variables relatives aux styles du test de Rorschach pour 17 détenus")
+```
 
+Les résultats obtenus ont été comparés aux normes proposées par @meyer2007toward à l'aide d'un test *t*. Il s'agit d'être prudent lors de l'interprétation de ce test *t* car de nombreuses variables du test de Rorschach ne présentent pas de distribution normale [@fontan2014approche].
+
+## Styles de EB
+
+```{r statdescstyleseb}
+kbl(rorstylesEBpropround, caption = "Fréquences (en pourcents) des styles de EB au test de Rorschach pour 17 détenus")
+```
+
+## EB Pervasive
+
+Concernant la variable EBPer, `r nombre_de_na_EBPer_num` (`r round(nombre_de_na_EBPer_num/Ntotal*100,0)` %) protocoles n'en présentent pas. Lorsqu'ils présentent un score de EBPer, la moyenne est égale à `r meanEBPer` (ET = `r sdEBPer`).
+
+# Références
