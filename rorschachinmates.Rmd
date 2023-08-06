@@ -1,0 +1,123 @@
+---
+title: "Rorschach Inmates"
+author: "Benjamin Thiry"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)        # for data wrangling and visualization
+library(moments)
+library(papaja)
+# library(DataExplorer)     # for exploratory data analysis
+# library(datasets)         # for getting the data
+library(flextable)        # beautifying tables
+rorschachtest <- read_csv2("C:/Users/Ouriagan/OneDrive/rorschach/rorschachtest.csv")
+attach(rorschachtest)
+```
+
+```{r}
+# create_report(rorschachtest)
+# dlookr::describe(rorschachtest) %>% flextable()
+```
+
+# Styles
+
+```{r}
+rorstyles.df <- data.frame(R, L, `Sum(M)`, WsumC, SumShd, es, esAj, `D score`, Daj, EA, `Sum(FM)`, `Sum(m')`, `Sum(C')`, `Sum(Y)`, `Sum(T)`, `Sum(V)`)
+
+# Normes
+rorstyles_norms <- data.frame(R= 22.31, L=0.86, `Sum(M)`=3.73, WsumC=3.11, SumShd=4.29, es=9.09, esAj=0, `D score`=-0.68, Daj=-0.20, EA=6.84, `Sum(FM)`=3.37, `Sum(m')`=1.50, `Sum(C')`=1.75, `Sum(Y)`=1.34, `Sum(T)`=0.65, `Sum(V)`=0.52)
+rorstyles_norms2 <- c(22.31, 0.86, 3.73, 3.11, 4.29, 9.09, 0, -0.68, -0.20, 6.84, 3.37, 1.50, 1.75, 1.34, 0.65, 0.52)
+# Attention : pas trouvé es ajusté, donc noté 0
+
+# Comparairons aux normes avec un test t
+
+# Charger la librairie tibble
+library(tibble)
+
+calculer_tests_t <- function(data, valeurs_cibles) {
+  # Créer une tibble vide pour stocker les résultats des tests t
+  resultats_tests <- tibble()
+  
+  # Parcourir chaque variable dans le data.frame
+  for (colonne_variable in colnames(data)) {
+    variable <- data[[colonne_variable]]
+    valeur_cible <- valeurs_cibles[[colonne_variable]]
+    
+    # Effectuer le test t
+    resultat_test <- t.test(variable, mu = valeur_cible)
+    resultat_test$p.value <- printp(resultat_test$p.value)
+    # Ajouter les résultats du test à la tibble
+    resultats_tests <- rbind(resultats_tests, c(colonne_variable, resultat_test$p.value))
+  }
+  
+  # Nommer les colonnes de la tibble
+  colnames(resultats_tests) <- c("Variable", "p_value")
+  
+  # Retourner la tibble contenant les résultats des tests t
+  return(resultats_tests)
+}
+
+
+resultats_tests <- calculer_tests_t(data = rorstyles.df, valeurs_cibles = rorstyles_norms)
+#print(resultats_tests)
+
+# Caclul des delta de Cohen
+
+# Charger la librairie tibble
+library(tibble)
+
+calculer_delta_cohen <- function(data, valeurs_cibles) {
+  # Créer une tibble vide pour stocker les résultats des delta de Cohen
+  resultats_delta <- tibble()
+  
+  # Parcourir chaque variable dans le data.frame
+  for (colonne_variable in colnames(data)) {
+    variable <- data[[colonne_variable]]
+    valeur_cible <- valeurs_cibles[[colonne_variable]]
+    
+    # Calculer le delta de Cohen
+    moyenne_variable <- mean(variable)
+    ecart_type_variable <- sd(variable)
+    moyenne_cible <- mean(valeur_cible)
+    delta_cohen <- ((moyenne_variable - moyenne_cible) / ecart_type_variable)
+    delta_cohen <- round(delta_cohen,2)
+    
+    # Ajouter les résultats du delta de Cohen à la tibble
+    resultats_delta <- rbind(resultats_delta, c(colonne_variable, delta_cohen))
+  }
+  
+  # Nommer les colonnes de la tibble
+  colnames(resultats_delta) <- c("Variable", "Delta_Cohen")
+  
+  # Retourner la tibble contenant les résultats des delta de Cohen
+  return(resultats_delta)
+}
+
+resultats_delta <- calculer_delta_cohen(data = rorstyles.df, valeurs_cibles = rorstyles_norms)
+print(resultats_delta)
+
+
+rorstyles_names <- c("R", "L", "M", "WSumC", "SumShd", "es", "esAdj", "D", "Dadj",  "EA", "FM", "m", "SumC'", "Y", "T", "V")
+rorstyles_mean <- c(mean(R), mean(L), mean(`Sum(M)`), mean(WsumC), mean(SumShd), mean(es), mean(esAj), mean(`D score`), mean(Daj),  mean(EA), mean(`Sum(FM)`), mean(`Sum(m')`), mean(`Sum(C')`), mean(`Sum(Y)`), mean(`Sum(T)`), mean(`Sum(V)`))
+rorstyles_mean <- round(rorstyles_mean, 2)
+rorstyles_sd <- c(sd(R), sd(L), sd(`Sum(M)`), sd(WsumC), sd(SumShd), sd(es), sd(esAj), sd(`D score`), sd(Daj),  sd(EA), sd(`Sum(FM)`), sd(`Sum(m')`), sd(`Sum(C')`), sd(`Sum(Y)`), sd(`Sum(T)`), sd(`Sum(V)`))
+rorstyles_sd <- round(rorstyles_sd,2)
+rorstyles_min = c(min(R), min(L), min(`Sum(M)`), min(WsumC), min(SumShd), min(es), min(esAj), min(`D score`), min(Daj),  min(EA), min(`Sum(FM)`), min(`Sum(m')`), min(`Sum(C')`), min(`Sum(Y)`), min(`Sum(T)`), min(`Sum(V)`))
+rorstyles_min <- round(rorstyles_min,2)
+rorstyles_max = c(max(R), max(L), max(`Sum(M)`), max(WsumC), max(SumShd), max(es), max(esAj), max(`D score`), max(Daj),  max(EA), max(`Sum(FM)`), max(`Sum(m')`), max(`Sum(C')`), max(`Sum(Y)`), max(`Sum(T)`), max(`Sum(V)`))
+rorstyles_max <- round(rorstyles_max,2)
+rorstyles_skewness = c(skewness(R), skewness(L), skewness(`Sum(M)`), skewness(WsumC), skewness(SumShd), skewness(es), skewness(esAj), skewness(`D score`), skewness(Daj),  skewness(EA), skewness(`Sum(FM)`), skewness(`Sum(m')`), skewness(`Sum(C')`), skewness(`Sum(Y)`), skewness(`Sum(T)`), skewness(`Sum(V)`))
+rorstyles_skewness <- round(rorstyles_skewness,2)
+rorstyles_kurtosis = c(kurtosis(R), kurtosis(L), kurtosis(`Sum(M)`), kurtosis(WsumC), kurtosis(SumShd), kurtosis(es), kurtosis(esAj), kurtosis(`D score`), kurtosis(Daj),  kurtosis(EA), kurtosis(`Sum(FM)`), kurtosis(`Sum(m')`), kurtosis(`Sum(C')`), kurtosis(`Sum(Y)`), kurtosis(`Sum(T)`), kurtosis(`Sum(V)`))
+rorstyles_kurtosis <- round(rorstyles_kurtosis,2)
+#rorstyles_p <- resultats_tests[,2]
+rorstyles_table <- data.frame(Variable=rorstyles_names, Moyenne=rorstyles_mean, ET=rorstyles_sd, Min=rorstyles_min, Max = rorstyles_max, Skewness=rorstyles_skewness, Kurtosis=rorstyles_kurtosis, Norms=rorstyles_norms2, p=resultats_tests[,2], d=resultats_delta[,2])
+rorstyles_table
+```
+
+
