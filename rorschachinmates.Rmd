@@ -16,24 +16,28 @@ library(moments)
 library(tibble)
 library(kableExtra)
 library(papaja)
-# library(DataExplorer)     # for exploratory data analysis
-# library(datasets)         # for getting the data
-# library(flextable)        # beautifying tables
+library(DataExplorer)     # for exploratory data analysis
+library(datasets)         # for getting the data
+library(flextable)        # beautifying tables
 rorschachtest <- read_csv2("C:/Users/Ouriagan/OneDrive/rorschach/rorschachtest.csv")
 attach(rorschachtest)
-```
 
-```{r}
-# create_report(rorschachtest)
-# dlookr::describe(rorschachtest) %>% flextable()
-```
-
-# Styles
-
-```{r echo=FALSE}
-Ntotal <- length(R)
+#age
+# meanage <- round(mean(age, na.rm = TRUE), digit = 2)
+# sdage <- round(sd(age, na.rm = TRUE), digit = 2)
+# minage <- round(min(age, na.rm = TRUE), digit = 2)
+# maxage <- round(max(age, na.rm = TRUE), digit = 2)
+# 
+# #sexe
+# nofmen <-length(which(sexe == "M")) 
+# nofmenpercentage <- round(100*(length(which(sexe == "M"))/length(sexe)), digit = 0)
+# 
+# nofwomen <- length(which(sexe == "F")) 
+# nofwomenpercentage <- round(100*(length(which(sexe == "F"))/length(sexe)), digit = 0)
 
 rorstyles.df <- data.frame(R, L, `Sum(M)`, WsumC, SumShd, es, esAj, `D score`, Daj, EA, `Sum(FM)`, `Sum(m')`, `Sum(C')`, `Sum(Y)`, `Sum(T)`, `Sum(V)`)
+Ntotal <- length(R)
+
 
 # Normes
 rorstyles_norms <- data.frame(R= 22.31, L=0.86, `Sum(M)`=3.73, WsumC=3.11, SumShd=4.29, es=9.09, esAj=0, `D score`=-0.68, Daj=-0.20, EA=6.84, `Sum(FM)`=3.37, `Sum(m')`=1.50, `Sum(C')`=1.75, `Sum(Y)`=1.34, `Sum(T)`=0.65, `Sum(V)`=0.52)
@@ -131,6 +135,32 @@ meanEBPer <-  round(mean(EBPer_num, na.rm = TRUE),2)
 sdEBPer <-  round(sd(EBPer_num, na.rm = TRUE),2)
 ```
 
+# Introduction
+
+Le test de Rorschach, développé par Hermann Rorschach au début du XXe siècle, demeure l'un des outils psychométriques les plus controversés et en même temps fascinants dans le domaine de la psychologie clinique et légale. L'approche d'administration et d'interprétation du test a évolué au fil du temps, et l'approche d'administration et d'interprétation élaborée par @exner1993rorschach dans ce qui est communément appelé le Système Intégré a suscité un regain d'intérêt pour le test au sein de la communauté scientifique. Bien que des débats persistent quant à sa validité et sa fiabilité, le Test de Rorschach selon le Système Intégré offre un potentiel unique pour fournir des informations approfondies dans le domaine de la psychologie légale.
+
+L'application du Test de Rorschach en psychologie légale se base sur la notion que les réponses d'un individu à des stimuli ambigus peuvent révéler des aspects cachés de sa personnalité, de ses émotions et de ses mécanismes de défense. Dans le contexte judiciaire, où la compréhension précise de la psychologie d'un individu peut avoir des implications majeures sur des questions telles que la responsabilité pénale, la détermination de la peine et l'évaluation de la crédibilité des témoins, l'utilisation du Test de Rorschach selon le Système Intégré de @exner1993rorschach peut apporter des éléments complémentaires aux méthodes d'évaluation traditionnelles.
+
+Cet article vise à comparer les résultats au test de Rorschach sur un échantillon de détenus belges francophones à un échantillon normatif international. Cet échantillon diffère-t-il de l'échantillon normatif. Dans l'affirmative, quelles variables du Système Intégré sont-elles concerncées ?
+
+En somme, cet article cherchera à démontrer que malgré les critiques, le Test de Rorschach selon la Méthode Exner peut constituer un outil précieux pour les professionnels de la psychologie légale, en fournissant des informations uniques et nuancées sur la psychologie des individus impliqués dans des affaires judiciaires. En se basant sur un ensemble de références théoriques solides, cet article encourage une réévaluation objective de l'utilité de cette approche en psychologie légale.
+
+# Utilisation du test de Rorschach en psychologie de la délinquance
+
+# Méthode
+
+## Participants
+
+
+Dans le cadre de cette évaluation, le / la psychologue en charge de l'évaluation peut administrer des tests psychologiques tels que le test de 
+Rorschach. La personne évaluée peut accepter ou refuser de passer ce test. En cas d'accord, le test est administré, coté, interprété puis discuté avec elle de manière la plus transparente possible. Notons à ce titre (et c'est important ici de le mentionner), que si la personne est réfractaire à l'évaluation et à rencontrer le / la psychologue, la passation de tests est généralement compromise, déconseillée et parfois impossible. La passation de tests nécessite de facto une collaboration minimale.
+
+
+
+# Styles
+
+
+
 ```{r statdescstyles, echo=FALSE}
 kbl(rorstyles_table, caption = "Statistiques descriptives des variables relatives aux styles du test de Rorschach pour 17 détenus")
 ```
@@ -146,5 +176,11 @@ kbl(rorstylesEBpropround, caption = "Fréquences (en pourcents) des styles de EB
 ## EB Pervasive
 
 Concernant la variable EBPer, `r nombre_de_na_EBPer_num` (`r round(nombre_de_na_EBPer_num/Ntotal*100,0)` %) protocoles n'en présentent pas. Lorsqu'ils présentent un score de EBPer, la moyenne est égale à `r meanEBPer` (ET = `r sdEBPer`).
+
+
+```{r}
+#create_report(rorstyles.df) # histo+cor+ACP
+#dlookr::describe(rorstyles.df) %>% flextable()
+```
 
 # Références
